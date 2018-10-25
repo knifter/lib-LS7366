@@ -5,12 +5,13 @@
 
 #include <Arduino.h>
 #include <SPI.h>
+#include <SPIDevice.h>
 
-class LS7366
+class LS7366 : SPIDevice
 {
     public:
-        LS7366(SPIClass& spi, const int8_t ss) : _spi(spi), _ss(ss) {}; 
-        ~LS7366() {};
+        LS7366(SPIClass& spi, const int8_t cs) : SPIDevice(spi, cs) {}; 
+        // ~LS7366() {};
 
         void begin(); 
 
@@ -25,10 +26,6 @@ class LS7366
 
         // Clear CNTR register by loading, obsolete?
         void load_cntr(uint32_t cntr);
-
-    private:
-        SPIClass& _spi;
-        uint8_t _ss;
 };
 
 #endif
