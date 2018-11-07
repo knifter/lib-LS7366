@@ -10,7 +10,9 @@
 class LS7366 : SPIDevice
 {
     public:
-        LS7366(SPIClass& spi, const int8_t cs) : SPIDevice(spi, cs) {}; 
+        SPISettings settie;
+
+        LS7366(SPIClass& spi, const int8_t cs) : SPIDevice(spi, cs, 1000000, SPI_MSBFIRST, SPI_MODE0) {}; 
         // ~LS7366() {};
 
         void begin(); 
@@ -26,6 +28,7 @@ class LS7366 : SPIDevice
 
         // Clear CNTR register by loading, obsolete?
         void load_cntr(uint32_t cntr);
+        
 };
 
 #endif
