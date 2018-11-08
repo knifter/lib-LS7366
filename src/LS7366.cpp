@@ -21,7 +21,7 @@
     #define MDR1_3BYTE          0b00000001
     #define MDR1_2BYTE          0b00000010
     #define MDR1_1BYTE          0b00000011
-    #define MDR1_COUNTING       0b00000100
+    #define MDR1_DISABLE_COUNTING       0b00000100
     #define MDR1_FLAG_IDX       0b00010000
     #define MDR1_FLAG_CMP       0b00100000
     #define MDR1_FLAG_BW        0b01000000
@@ -53,8 +53,6 @@ void LS7366::begin()
     // was:
     // wr(0x88)     OP_WR | MDR0
     // wr(0x03)     MDR0_QUAD_X4
-    // uint16_t mdr0 = (OP_WR | REG_MDR0) << 8 | REG_MDR0_CFG;
-    // write16(mdr0);
 
     // write({OP_WR | REG_MDR1, REG_MDR1_CFG}, 2);
 
@@ -62,6 +60,8 @@ void LS7366::begin()
     _spi.transfer(OP_WR | REG_MDR0);
     _spi.transfer(REG_MDR0_CFG);
     digitalWrite(_cs, HIGH);
+
+    // delayMicroseconds(SPI_DELAY);
 
     digitalWrite(_cs, LOW);
     _spi.transfer(OP_WR | REG_MDR1);
@@ -76,12 +76,11 @@ void LS7366::begin()
 // ****************************************************
 uint32_t LS7366::read_cntr() 
 {
-    digitalWrite(_cs, LOW);     // Begin SPI conversation
-
     // TvR declare variables where I use them
     uint32_t count;
     // was:
     // wr(0x60 0x00 0x00 0x00 0x00)
+    digitalWrite(_cs, LOW);     // Begin SPI conversation
     _spi.transfer(OP_RD | REG_CNTR);
     count = _spi.transfer(0x00);
     count <<= 8;
@@ -90,7 +89,7 @@ uint32_t LS7366::read_cntr()
     count |= _spi.transfer(0x00);
     count <<= 8;
     count |= _spi.transfer(0x00);
-    digitalWrite(_cs, HIGH);    // Terminate SPI conversation
+    digitalWrite(_cs, HIGH);    // Stop SPI conversation
 
     // Serial.print("count: 0x");
     // Serial.println(readEncoder(), HEX);
@@ -106,12 +105,13 @@ uint32_t LS7366::read_otr()
     // Transfer CNTR -> OTR
     digitalWrite(_cs, LOW);     // Begin SPI conversation
     _spi.transfer(OP_LOAD | REG_OTR);
-    digitalWrite(_cs, HIGH);     // Begin SPI conversation
+    digitalWrite(_cs, HIGH);     // Stop SPI conversation
 
-    delayMicroseconds(SPI_DELAY);
+    // delayMicroseconds(SPI_DELAY);
 
     // Read OTR
-    uint32_t count;
+    uint32_t count = 0;
+    digitalWrite(_cs, LOW);     // Begin SPI conversation
     _spi.transfer(OP_RD | REG_OTR);
     count = _spi.transfer(0x00);
     count <<= 8;
@@ -124,6 +124,22 @@ uint32_t LS7366::read_otr()
     
     return count;
 }
+
+// uint32_t LS7366::read_reg(const uint8_t reg, const uint8_t len) 
+// {
+//     // Read OTR
+//     uint32_t reg = 0;
+//     _spi.transfer(OP_RD | reg);
+//     while(len--)
+//     {
+//         reg <<= 8;
+//         reg |= _spi.transfer(0x00);
+//     };
+
+//     digitalWrite(_cs, HIGH);    // Terminate SPI conversation
+    
+//     return reg;
+// }
 
 // ****************************************************
 // Resets Encoders to 0x00 0x00 0x00 0x00 (0 0 0 0)
@@ -142,13 +158,10 @@ void LS7366::load_cntr(uint32_t cntr)
     digitalWrite(_cs, LOW);     // Begin SPI conversation
     // 0x98 = 0b10 011 000 = OP_WR | REG_DTR
     _spi.transfer(OP_WR | REG_DTR);
-    _spi.transfer(cntr & 0x000000FF);
-    cntr >>= 8;
-    _spi.transfer(cntr & 0x000000FF);
-    cntr >>= 8;
-    _spi.transfer(cntr & 0x000000FF);
-    cntr >>= 8;
-    _spi.transfer(cntr & 0x000000FF);
+    _spi.transfer((cntr >> 24) & 0x000000FF);
+    _spi.transfer((cntr >> 16) & 0x000000FF);
+    _spi.transfer((cntr >>  8) & 0x000000FF);
+    _spi.transfer((cntr >>  0) & 0x000000FF);
     digitalWrite(_cs, HIGH);    // Terminate SPI conversation
 
     delayMicroseconds(SPI_DELAY);  // provides some breathing room between SPI converrsations

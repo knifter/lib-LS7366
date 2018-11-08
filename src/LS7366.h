@@ -28,7 +28,7 @@ class LS7366 : SPIDevice
 
         // Clear CNTR register by loading, obsolete?
         void load_cntr(uint32_t cntr);
-        
+
 };
 
 #endif
