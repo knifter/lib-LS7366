@@ -61,8 +61,6 @@ void LS7366::begin()
     _spi.transfer(REG_MDR0_CFG);
     digitalWrite(_cs, HIGH);
 
-    // delayMicroseconds(SPI_DELAY);
-
     digitalWrite(_cs, LOW);
     _spi.transfer(OP_WR | REG_MDR1);
     _spi.transfer(REG_MDR1_CFG);
@@ -76,7 +74,6 @@ void LS7366::begin()
 // ****************************************************
 uint32_t LS7366::read_cntr() 
 {
-    // TvR declare variables where I use them
     uint32_t count;
     // was:
     // wr(0x60 0x00 0x00 0x00 0x00)
@@ -91,9 +88,6 @@ uint32_t LS7366::read_cntr()
     count |= _spi.transfer(0x00);
     digitalWrite(_cs, HIGH);    // Stop SPI conversation
 
-    // Serial.print("count: 0x");
-    // Serial.println(readEncoder(), HEX);
-
     return count;
 }
 
@@ -106,8 +100,6 @@ uint32_t LS7366::read_otr()
     digitalWrite(_cs, LOW);     // Begin SPI conversation
     _spi.transfer(OP_LOAD | REG_OTR);
     digitalWrite(_cs, HIGH);     // Stop SPI conversation
-
-    // delayMicroseconds(SPI_DELAY);
 
     // Read OTR
     uint32_t count = 0;
@@ -125,22 +117,6 @@ uint32_t LS7366::read_otr()
     return count;
 }
 
-// uint32_t LS7366::read_reg(const uint8_t reg, const uint8_t len) 
-// {
-//     // Read OTR
-//     uint32_t reg = 0;
-//     _spi.transfer(OP_RD | reg);
-//     while(len--)
-//     {
-//         reg <<= 8;
-//         reg |= _spi.transfer(0x00);
-//     };
-
-//     digitalWrite(_cs, HIGH);    // Terminate SPI conversation
-    
-//     return reg;
-// }
-
 // ****************************************************
 // Resets Encoders to 0x00 0x00 0x00 0x00 (0 0 0 0)
 // RETURNS: N/A
@@ -156,7 +132,6 @@ void LS7366::load_cntr(uint32_t cntr)
 {
     // Write to DTR and load 0-data
     digitalWrite(_cs, LOW);     // Begin SPI conversation
-    // 0x98 = 0b10 011 000 = OP_WR | REG_DTR
     _spi.transfer(OP_WR | REG_DTR);
     _spi.transfer((cntr >> 24) & 0x000000FF);
     _spi.transfer((cntr >> 16) & 0x000000FF);
