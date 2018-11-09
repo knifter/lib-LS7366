@@ -15,7 +15,7 @@
     #define MDR0_INDEX_LOAD_O   0x30
     #define MDR0_POSITIVE_INDEX 0x40
     #define MDR0_CLOCKDIV       0x80
-#define REG_MDR0_CFG            (MDR0_QUAD_X1 | MDR0_MODE_FREE | MDR0_INDEX_DISABLE)
+#define REG_MDR0_CFG            (MDR0_QUAD_X4 | MDR0_MODE_FREE | MDR0_INDEX_DISABLE)
 #define REG_MDR1                0b00010000
     #define MDR1_4BYTE          0b00000000
     #define MDR1_3BYTE          0b00000001
