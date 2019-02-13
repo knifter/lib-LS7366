@@ -1,4 +1,4 @@
-#ifndef __LS7366__H
+#ifndef __LS7366_H
 #define __LS7366_H
 
 #include <stdint.h>
@@ -31,4 +31,4 @@ class LS7366 : SPIDevice
 
 };
 
-#endif
+#endif // __LS7366_H
